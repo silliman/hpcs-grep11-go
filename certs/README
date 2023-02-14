@@ -1,0 +1,9 @@
+Three files must be placed in this directory and their names must
+match what is listed here. If you use different names these files
+then you must change the source code near the top 
+of ../examples/server_test.go
+
+client.key - the RSA private key that you create
+client.pem - the X509 Certficate that the GREP11 CA registrar provides to you
+grep11-ca.pem - the X509 Certificate of the GREP11 CA to enable mutual TLS authentication
+

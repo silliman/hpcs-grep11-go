@@ -13,6 +13,7 @@ import (
 	"crypto/tls"
 	"encoding/asn1"
 	"fmt"
+        "io/ioutil"
 	"math/big"
 	"os"
 	"os/signal"
@@ -32,19 +33,29 @@ import (
 // See the cipher flow diagram contained in the README.md file of this repository for additional information
 
 // The following IBM Cloud HPCS service items need to be changed prior to running the sample program
-var (
-	Address     = "<grep11_server_address>:<port>"
-	APIKey      = "<ibm_cloud_apikey>"
-	IAMEndpoint = "https://iam.cloud.ibm.com"
-)
 
-var callOpts = []grpc.DialOption{
-	grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{})),
-	grpc.WithPerRPCCredentials(&util.IAMPerRPCCredentials{
-		APIKey:   APIKey,
-		Endpoint: IAMEndpoint,
-	}),
+const Address = "STUDENT_GREP11SERVER_IP:9876"
+const cert = "../certs/client.pem"
+const key = "../certs/client.key"
+const ca = "../certs/grep11-ca.pem"
+
+
+func getCallOpts() []grpc.DialOption {
+        certificate, _ := tls.LoadX509KeyPair(cert, key)
+        cacert, _ := ioutil.ReadFile(ca)
+        certPool := x509.NewCertPool()
+        certPool.AppendCertsFromPEM(cacert)
+        callOpts := []grpc.DialOption{
+                grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{
+                        ServerName:   Address,
+                        Certificates: []tls.Certificate{certificate},
+                        RootCAs:      certPool,
+                })),
+        }
+        return callOpts
 }
+
+var callOpts = getCallOpts()
 
 // Example_getMechanismInfo retrieves a mechanism list and retrieves detailed information for the CKM_RSA_PKCS mechanism
 // Flow: connect, get mechanism list, get mechanism info

@@ -11,6 +11,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"crypto/tls"
+        "crypto/x509"
 	"encoding/asn1"
 	"fmt"
         "io/ioutil"
